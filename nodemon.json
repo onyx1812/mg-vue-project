@@ -1,0 +1,9 @@
+{
+  "restartable": "rs",
+  "watch": [
+    "./server/server.js",
+    "./front/dist",
+    "./back/dist"
+  ],
+  "ext": "js,json,css,jpg,png,html"
+}
