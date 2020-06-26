@@ -3,7 +3,7 @@ module.exports = (db, callback) => {
 	const tables = [
 		{
 			name: 'users',
-			sql: 'ID INT AUTO_INCREMENT, PRIMARY KEY(ID), user_login VARCHAR(60), user_pass VARCHAR(255), user_name VARCHAR(255), user_email VARCHAR(100), user_registered DATETIME DEFAULT NOW(), user_role INT(1) DEFAULT "0"'
+			sql: 'ID INT AUTO_INCREMENT, PRIMARY KEY(ID), password VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(100), phone VARCHAR(20), country VARCHAR(255), city VARCHAR(255), address VARCHAR(255), balance DECIMAL(15,2), story LONGTEXT, registered DATETIME DEFAULT NOW(), role INT(1) DEFAULT "0", UNIQUE KEY unique_email (email)'
 		},
 		{
 			name: 'posts',
@@ -11,6 +11,24 @@ module.exports = (db, callback) => {
 		}
 	]
 	let i = 0;
+	const json = {
+		games: [
+			{
+				items: [{item:1, bet: '1.00'}, {item:30, bet: '2.00'}, {item:24, bet: '2.50'}],
+				rate: '1.00',
+				won: '20',
+				result: 0,
+				date: '01-04-2020, 20:22:56'
+			},
+			{
+				items: [{item:1, bet: '1.00'}, {item:30, bet: '2.00'}, {item:24, bet: '2.50'}],
+				rate: '1.00',
+				won: '30',
+				result: 1,
+				date: '01-05-2020, 20:28:59'
+			}
+		]
+	};
 	tables.forEach(table => {
 		let sql = `SELECT 1 FROM ${table.name} LIMIT 1`;
 		db.query(sql, (err, result) => {
@@ -29,19 +47,25 @@ module.exports = (db, callback) => {
 					const date = new Date();
 					if(table.name == 'users'){
 						let user = {
-							user_login: 'admin',
-							user_pass: 'qwerty123456',
-							user_name: 'Admin Admin',
-							user_email: 'admin@example.com',
-							user_registered: date,
-							user_role: 1
+							password: '9J8iak45@',
+							first_name: 'Max',
+							last_name: 'Globa',
+							email: 'onyx18121990@gmail.com',
+							phone: '+380731817768',
+							country: 'UA',
+							city: 'Mykolaiv',
+							address: '38A Lazurna, 64 apt.',
+							balance: 100.00,
+							story: JSON.stringify(json),
+							registered: date,
+							role: 1
 						};
 						sql = 'INSERT INTO users SET ?';
 						db.query(sql, user, (err, result) => {
 							if(err) throw err
 							console.log('User added')
-							console.log('    user: admin')
-							console.log('    pass: qwerty123456')
+							console.log('    user: onyx1812')
+							console.log('    pass: 9J8iak45@')
 						});
 					}
 					else if(table.name == 'posts'){

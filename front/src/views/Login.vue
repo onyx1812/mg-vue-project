@@ -1,28 +1,31 @@
 <template>
   <div class="content content-login">
     <div class="container">
-      <h1>Login page</h1>
       <form @submit="formSubmit" id="login" class="form form-login">
+        <h2>Log In</h2>
         <ul class="fields">
           <li class="field">
-            <input type="email" name="user_email" v-model="user_email" placeholder="Email" >
+            <input type="email" name="email" v-model="email" placeholder="Email" >
           </li>
           <li class="field">
-            <input type="password" name="user_pass" v-model="user_pass" placeholder="Password" >
+            <input type="password" name="password" v-model="password" placeholder="Password" >
           </li>
           <li class="field">
             <input type="submit" value="LOGIN">
           </li>
         </ul>
-        <p>Don't have an account yet? <router-link to="/register">Register now</router-link></p>
+        <p>У вас еще нет аккаунта? <router-link to="/register">Регистрация</router-link></p>
+        <p><router-link to="/lost-password">Забыли пароль?</router-link></p>
         <p class="error" v-if="error">Please check your data and try again</p>
-        <p class="sucess" v-if="sucess">{{sucess}}</p>
+        <div class="sucess" v-if="sucess">{{sucess_msg}}</div>
+        <div class="loader" v-if="loader"></div>
     </form>
     </div>
   </div>
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
   beforeMount(){
     const user_data = JSON.parse( sessionStorage.getItem('USER_DATA') );
@@ -34,17 +37,20 @@ export default {
     return {
       error: false,
       sucess: false,
-      user_email: null,
-      user_pass: null,
+      sucess_msg: null,
+      email: null,
+      password: null,
+      loader: false,
     };
   },
   methods: {
     formSubmit(e) {
-      if(this.user_email && this.user_pass) {
+      this.loader = true;
+      if(this.email && this.password) {
         const url = '/api/user';
         const data = {
-          'user_email': this.user_email,
-          'user_pass': this.user_pass
+          'email': this.email,
+          'password': this.password
         };
         fetch(url, {
           method: 'POST',
@@ -57,20 +63,24 @@ export default {
           .then(data => {
             if(data == false){
               this.error = true;
+              this.loader = false;
             } else {
               sessionStorage.setItem('USER_DATA', JSON.stringify(data[0]));
-              this.sucess = data[0].user_name+', welcome back!'
+              this.sucess = true;
+              this.sucess_msg = data[0].first_name+' '+data[0].last_name+', welcome to LaPlus!'
               setTimeout(()=>{
-                this.$router.push('/profile')
-              }, 3000);
+                this.$store.state.logined = true;
+                this.$router.push('/profile');
+              }, 1500);
             }
           })
           .catch(err => {
+            this.loader = false;
             console.error(err);
           });
       }
 
-      if (!this.user_email || !this.user_pass) {
+      if (!this.email || !this.password) {
         this.error = true;
       }
       setTimeout(() => {
